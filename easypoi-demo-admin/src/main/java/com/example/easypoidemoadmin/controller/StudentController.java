@@ -25,7 +25,7 @@ public class StudentController {
     private StudentService studentService;
 
     /**
-     * 查询用户信息列表
+     * 查询学生信息列表
      *
      * @param name
      * @param page
