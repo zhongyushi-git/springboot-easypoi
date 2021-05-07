@@ -59,9 +59,9 @@ const request = {
     postResponse(url, params) {
         return new Promise((resolve, reject) => {
             axios.request({
-                url:url,
-                method:'POST',
-                data:params,
+                url: url,
+                method: 'POST',
+                data: params,
                 responseType: 'arraybuffer'
             })
                 .then(res => {
@@ -73,4 +73,33 @@ const request = {
         });
     },
 }
+
+//响应拦截器
+axios.interceptors.response.use(
+    response => {
+        const headers = response.headers
+        // 此类为下载流文件，不拦截
+        if (headers['content-type'] === 'application/octet-stream;charset=utf-8') {
+            return response
+        }
+        if (headers['content-type'] === 'arrayBuffer;charset=UTF-8') {
+            return response
+        }
+        if (headers['content-type'] === 'application/vnd.ms-excel;charset=UTF-8') {
+            return response
+        }
+
+        if (response.request.responseType === 'arraybuffer') {
+            const enc = new TextDecoder('utf-8')
+            response.data = JSON.parse(enc.decode(new Uint8Array(res)))
+        }
+        return response
+
+
+    },
+    error => {
+        console.log('err' + error) // for debug
+    }
+)
+
 export default request

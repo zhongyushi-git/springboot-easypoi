@@ -9,6 +9,7 @@ import cn.afterturn.easypoi.excel.entity.ExportParams;
 import cn.afterturn.easypoi.excel.entity.ImportParams;
 import cn.afterturn.easypoi.excel.entity.TemplateExportParams;
 import cn.afterturn.easypoi.excel.entity.enmus.ExcelType;
+import cn.afterturn.easypoi.excel.entity.result.ExcelImportResult;
 import cn.afterturn.easypoi.word.WordExportUtil;
 import cn.afterturn.easypoi.word.parse.ParseWord07;
 import org.apache.commons.lang3.StringUtils;
@@ -19,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
@@ -287,6 +287,7 @@ public class ExcelUtils {
 
     /**
      * word模板导出多页
+     *
      * @param list
      * @param templatePath
      * @param fileName
@@ -296,5 +297,51 @@ public class ExcelUtils {
     public static void WordTemplateExportMorePage(List<Map<String, Object>> list, String templatePath, String fileName, HttpServletResponse response) throws Exception {
         XWPFDocument doc = new ParseWord07().parseWord(templatePath, list);
         downLoadWord(fileName, response, doc);
+    }
+
+    /**
+     * excel 导入，有错误信息
+     *
+     * @param file      上传的文件
+     * @param pojoClass pojo类型
+     * @param <T>
+     * @return
+     */
+    public static <T> ExcelImportResult<T> importExcelMore(MultipartFile file, Class<T> pojoClass) throws IOException {
+        if (file == null) {
+            return null;
+        }
+        try {
+            return importExcelMore(file.getInputStream(), pojoClass);
+        } catch (Exception e) {
+            throw new IOException(e.getMessage());
+        }
+    }
+
+    /**
+     * excel 导入
+     *
+     * @param inputStream 文件输入流
+     * @param pojoClass   pojo类型
+     * @param <T>
+     * @return
+     */
+    private static <T> ExcelImportResult<T> importExcelMore(InputStream inputStream, Class<T> pojoClass) throws IOException {
+        if (inputStream == null) {
+            return null;
+        }
+        ImportParams params = new ImportParams();
+        params.setTitleRows(1);//表格内数据标题行
+        params.setHeadRows(1);//表头行
+        params.setSaveUrl("/excel/");
+        params.setNeedSave(true);
+        params.setNeedVerify(true);
+        try {
+            return ExcelImportUtil.importExcelMore(inputStream, pojoClass, params);
+        } catch (NoSuchElementException e) {
+            throw new IOException("excel文件不能为空");
+        } catch (Exception e) {
+            throw new IOException(e.getMessage());
+        }
     }
 }
