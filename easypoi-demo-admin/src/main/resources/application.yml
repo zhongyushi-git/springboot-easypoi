@@ -1,0 +1,31 @@
+server:
+  #配置通过项目名访问
+  servlet:
+    context-path: /easypoidemo-admin/
+  #配置端口号
+  port: 8001
+
+#配置数据源
+spring:
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    url: jdbc:mysql://127.0.0.1:3306/db2020?useUnicode=true&characterEncoding=UTF-8&serverTimezone=CTT&zeroDateTimeBehavior=convertToNull&useSSL=false&allowMultiQueries=true
+    username: root
+    password: zys123456
+  #easypoi启用覆盖
+  main:
+    allow-bean-definition-overriding: true
+
+mybatis:
+  #指定mapper.xml的位置
+  mapperLocations: classpath*:mapper/*Mapper.xml
+  #配置别名
+  type-aliases-package: com.example.easypoidemoadmin.entity
+
+#配置打印日志
+logging:
+  level:
+    com.example.easypoidemoadmin: debug
+
+
+
